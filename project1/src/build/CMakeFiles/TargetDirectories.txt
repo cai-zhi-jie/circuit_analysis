@@ -1,0 +1,3 @@
+/mnt/d/workspace/circuit_analysis/project1/src/build/CMakeFiles/rebuild_cache.dir
+/mnt/d/workspace/circuit_analysis/project1/src/build/CMakeFiles/edit_cache.dir
+/mnt/d/workspace/circuit_analysis/project1/src/build/CMakeFiles/MNA.dir

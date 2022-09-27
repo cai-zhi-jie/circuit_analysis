@@ -1,0 +1,1 @@
+/usr/bin/c++   -O3 -Werror=return-type -pthread  -rdynamic CMakeFiles/MNA.dir/main.cpp.o  -o MNA 
