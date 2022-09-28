@@ -2,7 +2,7 @@
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 10:48:08 
  * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-27 16:37:47
+ * @Last Modified time: 2022-09-28 22:53:52
  */
 #pragma once
 
@@ -12,25 +12,22 @@
 #include <string>
 #include <vector>
 
-#include "cap.hpp"
-#include "device.hpp"
-#include "ind.hpp"
-#include "isrc.hpp"
-#include "mat.hpp"
-#include "mut.hpp"
-#include "res.hpp"
-#include "util.hpp"
-#include "vsrc.hpp"
+// #include "db/cap.hpp"
+// #include "db/device.hpp"
+// #include "db/ind.hpp"
+// #include "db/isrc.hpp"
+// #include "db/mut.hpp"
+// #include "db/res.hpp"
+// #include "db/vsrc.hpp"
 
-/// \class Stamp 
-///
-/// \brief Stamp engine
-/// 
-/// The class Stamp is actually the syamp engine. It contains necessary data
-/// structures for completing the work. 
-class Stamp{
+// #include "utils/mat.hpp"
+#include "db/db.hpp"
+#include "db/subckt.hpp"
+#include "utils/util.hpp"
+
+class Stamp {
 public:
-  Stamp() {}
+  Stamp() { _db = std::make_shared<DB>(); }
   ~Stamp() {}
 
   void parse(char* filename);
@@ -38,66 +35,19 @@ public:
   void setup();
  
 private:
-  std::vector<Device*> _dev_list;
-  std::map<std::string, int> _node_list;
- 
-  /// Probe list is built up from the .PROBE card in the SPICE netlist.
-  /// It specifies which nodes needs to be examined. And system matrix
-  /// \f$ L^T \f$ is built from it. 
-  std::vector<int> _probe_list;
- 
-  /// Matrix C holds the contribution from capacitors and inductors.
-  Matrix _C;
-
-  /// Matrix G holds conductance.
-  Matrix _G;
-
-  /// Matrix B is the input incident matrix
-  Matrix _B;
-
-  /// Matrix L^T is the output incident matrix
-  Matrix _LT;
-
-  int _num_in;
-  int _num_out;
+  std::shared_ptr<DB> _db;
 };
 
-
-/// \brief Initialize the system matrix and carry out the stamping
-///
-/// This function is most important one because it setups up the liear system
-/// \f[
-/// \left\{\begin{array}{ccc}
-///   C\dot{x}+Gx &=& Bu \\
-///   y &=& L^T x \end{array}\right.
-/// \f]
-/// and fills in the elements in the system matrices. 
-/// 
-/// The matrix class \e Matrix needs to be designed by you.
-/// Sparse matrix structure is preferred than the dense one since
-/// the matrix will be very large while most of its elemets would be zero. 
-/// 
-/// In the skeleton program, the devices are enumerated and
-/// they contributes to the system matrices by calling thier own stamping function.
-/// 
-/// \todo 
-/// = Some devices such as mutual inductance depends on other devices. You need to 
-///  take care of this situation. 
-/// - We also have to enumerate the probe list to build the
-/// \f$ L^T \f$ matrix. 
-/// - SPICE file support multi-line command with a \e '+' at the beginning of the line.
-/// Please consider how to support this. 
-/// 
 void Stamp::setup(){
-  int n = static_cast<int>(_node_list.size()) - 1;
-  _C = Matrix(n,n);
-  _G = Matrix(n,n);
-  _B = Matrix(n, _num_in);
-  _LT = Matrix(_num_out, n);
-  
-  for(size_t i=0; i < _dev_list.size(); ++i){
-    _dev_list[i]->stamp(_C,_G,_B);
+  int n = static_cast<int>(_db->_node_list.size()) - 1;
+  _db->_C = Matrix(n,n);
+  _db->_G = Matrix(n,n);
+  _db->_B = Matrix(n, _db->_num_in);
+  _db->_LT = Matrix(_db->_num_out, n);
+  for(size_t i=0; i < _db->_dev_list.size(); ++i){
+    _db->_dev_list[i]->stamp(_db->_C, _db->_G, _db->_B);
   }
+  _db->show();
 }
 
 
@@ -115,231 +65,131 @@ void Stamp::output(char* filename)
   
 }
 
-
-/// \brief Parsing the SPICE netlist
-///
-/// @param filename SPICE filename
-///
-/// This is the first step of STAMP. It reads in the SPICE file and
-/// extracts device and node information from it. The devices and nodes
-/// are stored in \e _dev_list and \e _node_list for later usage. 
-/// The parser reads in the SPICE netlist line by line. It breaks each line into
-/// string tokens according to the delimiters, and then processes each token case by case.
-/// Notice the using of \e tokenizer and \e captilizer. These two functions break the
-/// line and convert them to upper case. (SPICE file are not case-sensitive)
-///
-/// \todo Currently, only limited devices cards for SPICE are considered. You can 
-/// Further develop this fucntion to  accomodate more SPICE elements or cards such as 
-/// subcircuit or controlled sources. 
 void Stamp::parse(char* filename)
 {
   std::ifstream ifid(filename);
-  _num_in = 0;
-  _num_out = 0;
+  _db->_num_in = 0;
+  _db->_num_out = 0;
 	
   std::string line;
   std::string delims(" \n\r()\t");
-  int k = 0;
-  _node_list["0"] = 0;
-
+  _db->_node_list["0"] = 0;
+  
+  auto add_node = [](std::map<std::string, int>& nl, std::string& name)->int{
+    if(nl.find(name) == nl.end()) {
+      nl[name] = nl.size();
+    }
+    return nl[name];
+  };
   while(std::getline(ifid, line)) {
     std::string tmp;
     capitalize(line);
     // skip comment
-    if (line[0] == '*') continue;
-    if (line[0] == 'R'){
-      // name
-      tmp = tokenizer(line, delims);
-      Resistor* r = new Resistor(tmp);
+    char first_letter = line[0];
+    std::string whole_line = line;
+    if (first_letter == '*') continue;
+    std::vector<std::string> tokens;
+    while ((tmp = tokenizer(line,delims)) != "") {
+      tokens.emplace_back(tmp);
+    }
+    if (tokens.size() == 0) continue;
 
-      // pnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setPnode(_node_list[tmp]);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setNnode(_node_list[tmp]);
-
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-    } else if (line[0] == 'C'){
-      // name
-      tmp = tokenizer(line, delims);
-      Capacitor* r = new Capacitor(tmp);
-
-      // pnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setPnode(_node_list[tmp]);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setNnode(_node_list[tmp]);
-
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-    } else if (line[0] == 'I'){
-      // name
-      tmp = tokenizer(line, delims);
-      Isrc* r = new Isrc(tmp);
-
-      // pnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setPnode(_node_list[tmp]);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setNnode(_node_list[tmp]);
-
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-      ++_num_in;
-    } else if (line[0] == 'V'){
-      // name
-      tmp = tokenizer(line, delims);
-      Vsrc* r = new Vsrc(tmp);
-          
-      // aux current
-      tmp = "i:"+tmp;
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setAux(_node_list[tmp]);
-
-      // pnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setPnode(_node_list[tmp]);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setNnode(_node_list[tmp]);
-          
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-      ++_num_out;
-    } else if (line[0] == 'L'){
-      // name
-      tmp = tokenizer(line, delims);
-      Inductor* r = new Inductor(tmp);
-          
-      // aux current
-      tmp = "i:"+tmp;
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setAux(_node_list[tmp]);
-
-      // pnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setPnode(_node_list[tmp]);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      if(_node_list.find(tmp) == _node_list.end())
-        {
-          _node_list[tmp] = ++k;
-        }
-      r->setNnode(_node_list[tmp]);
-          
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-    } else if (line[0] == 'K'){
-      // name
-      tmp = tokenizer(line, delims);
-      Mutual* r = new Mutual(tmp);
-          
-      // pnode
-      tmp = tokenizer(line, delims);
-      r->setInd1(tmp);
-
-      // nnode
-      tmp = tokenizer(line, delims);
-      r->setInd2(tmp);
-          
-      // value
-      tmp = tokenizer(line, delims);
-      r->setValue(to_double(tmp));
-
-      // add to device list
-      _dev_list.push_back(r);
-    } else {
-      std::string token = tokenizer(line, delims);
-      // netlist file ends
-      if (token == ".END") {
-        return;
+    if (first_letter == 'R'){
+      Resistor* r = new Resistor(tokens[0]);
+      r->setPnode(add_node(_db->_node_list, tokens[1]));
+      r->setNnode(add_node(_db->_node_list, tokens[2]));
+      r->setValue(to_double(tokens[3]));
+      _db->_dev_list.emplace_back(r);
+    } else if (first_letter == 'C'){
+      Capacitor* r = new Capacitor(tokens[0]);
+      r->setPnode(add_node(_db->_node_list, tokens[1]));
+      r->setNnode(add_node(_db->_node_list, tokens[2]));
+      r->setValue(to_double(tokens[3]));      
+      _db->_dev_list.emplace_back(r);
+    } else if (first_letter == 'I'){
+      Isrc* r = new Isrc(tokens[0]);
+      r->setPnode(add_node(_db->_node_list, tokens[1]));
+      r->setNnode(add_node(_db->_node_list, tokens[2]));
+      if (tokens.size() == 5) {
+        r->setType(tokens[3]);
       }
-      // specify output node
-      else if (token == ".PROBE" /*|| token == ".PRINT"*/) {
-        token = tokenizer(line, delims);
-        while(!token.empty()){
-          if(token == "V")
-            {
-        token = tokenizer(line, delims);
-        continue;
+      r->setValue(to_double(tokens.back()));
+      _db->_dev_list.emplace_back(r);
+      (_db->_num_in)++;
+    } else if (first_letter == 'V'){
+      Vsrc* r = new Vsrc(tokens[0]);
+      r->setPnode(add_node(_db->_node_list, tokens[1]));
+      r->setNnode(add_node(_db->_node_list, tokens[2]));
+      if (tokens.size() == 5) {
+        r->setType(tokens[3]);
+      }
+      r->setValue(to_double(tokens.back()));
+      _db->_dev_list.emplace_back(r);
+      (_db->_num_in)++;
+    } else if (first_letter == 'L'){
+      Inductor* r = new Inductor(tokens[0]);
+      r->setPnode(add_node(_db->_node_list, tokens[1]));
+      r->setNnode(add_node(_db->_node_list, tokens[2]));
+      r->setValue(to_double(tokens[3]));
+      _db->_dev_list.emplace_back(r);
+    } else if (first_letter == 'K'){
+      Mutual* r = new Mutual(tokens[0]);
+      r->setInd1(tokens[1]);
+      r->setInd2(tokens[2]);
+      r->setValue(to_double(tokens[3]));
+      _db->_dev_list.emplace_back(r);
+    } else if (first_letter == 'X') {
+      Subckt s;
+      s.instantiate(whole_line , filename, _db);
+    } else {
+      // netlist file ends
+      if (tokens[0] == ".END") {
+        break;
+      } else if (tokens[0] == ".SUBCKT") {
+        // skip sub-circuit data since it's solved in "X" by the class Subckt
+        while (getline(ifid,line)) {
+          std::string token = tokenizer(line, delims);
+          if(token == ".ENDS")
+            break;
+        }
+      } else if (tokens[0] == ".PROBE" /*|| token == ".PRINT"*/) {
+        std::string token = tokenizer(whole_line, delims);
+        while (!token.empty()){
+          if (token == "V") {
+            token = tokenizer(whole_line, delims);
+            continue;
+          }
+          // make sure the probe node is within the node list
+          if (_db->_node_list.find(token) != _db->_node_list.end()) {
+            // remove duplicated probe node
+            if (_db->_probe_set.find(token) == _db->_probe_set.end()) {
+              _db->_probe_list.emplace_back(_db->_node_list[token]);
+              _db->_probe_set.emplace(token);
+              (_db->_num_out)++;
             }
-          _probe_list.push_back(_node_list[token]);
-          ++_num_out;
-          token = tokenizer(line, delims);
+          }
+          token = tokenizer(whole_line, delims);
         }
       }
     }
-  } // end while
+  }
   ifid.close();
+
+  //aux_node
+  for (auto d : _db->_dev_list) {
+    std::string dev_name = d->getName();
+    if (dev_name[0] == 'L') {
+      Inductor* l = dynamic_cast<Inductor*>(d);
+      std::string tmp = "i:" + dev_name;
+      add_node(_db->_aux_node_list, tmp);
+      l->setAux(_db->_aux_node_list[tmp]);
+    } else if(dev_name[0] == 'V') {
+      Vsrc* v = dynamic_cast<Vsrc*>(d);
+      std::string tmp = "i:" + dev_name;
+      add_node(_db->_aux_node_list, tmp);
+      v->setAux(_db->_aux_node_list[tmp]);
+    }
+
+  }
+
 }

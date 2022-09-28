@@ -2,7 +2,7 @@
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 11:46:34 
  * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-27 14:25:08
+ * @Last Modified time: 2022-09-28 14:57:08
  */
 
 #include <iostream>
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]){
 
   /// phase 2: stamping
   s.setup();
-
+  
   /// phase 3: output
   s.output(argv[2]);
 	
