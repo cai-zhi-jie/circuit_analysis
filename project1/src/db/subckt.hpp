@@ -2,7 +2,7 @@
  * @Author: Zhijie Cai
  * @Date: 2022-09-28 12:55:18
  * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 22:35:46
+ * @Last Modified time: 2022-09-30 23:48:00
  */
 #pragma once
 
@@ -26,7 +26,6 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
   std::vector<std::string> tokens;
   std::string delims(" \n\r()\t");
   std::string tmp;
-  std::cout << __LINE__ << " : " << xline << std::endl;
   while ((tmp = tokenizer(xline, delims)) != "") {
     tokens.emplace_back(tmp);
   }
@@ -38,6 +37,8 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
   std::string subckt_name = tokens.back();
   std::vector<int> ext_port_node_list;
   for (int i = 1; i < static_cast<int>(tokens.size()) - 1; i++) {
+    if (tokens[i] != "0") {
+    } 
     if (_db->_node_list.find(tokens[i]) == _db->_node_list.end()) {
       _db->_node_list[tokens[i]] = _db->_node_list.size();
     }
@@ -89,12 +90,14 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
         r->setPnode(add_node(tmp_tokens[1]));
         r->setNnode(add_node(tmp_tokens[2]));
         r->setValue(to_double(tmp_tokens[3]));
+        _db->_dev_idx["R"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
       } else if (first_letter == 'C'){
         Capacitor* r = new Capacitor(dev_name);
         r->setPnode(add_node(tmp_tokens[1]));
         r->setNnode(add_node(tmp_tokens[2]));
         r->setValue(to_double(tmp_tokens[3]));
+        _db->_dev_idx["C"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
       } else if (first_letter == 'I'){
         Isrc* r = new Isrc(dev_name);
@@ -106,6 +109,7 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
           r->setType(tmp_tokens[3]);
         }
         r->setValue(to_double(tmp_tokens.back()));
+        _db->_dev_idx["I"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
         (_db->_num_in)++;
       } else if (first_letter == 'V'){
@@ -116,6 +120,7 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
           r->setType(tmp_tokens[3]);
         }
         r->setValue(to_double(tmp_tokens.back()));
+        _db->_dev_idx["V"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
         (_db->_num_in)++;
       } else if (first_letter == 'L'){
@@ -123,17 +128,49 @@ void Subckt::instantiate(std::string xline, std::string filename, std::shared_pt
         r->setPnode(add_node(tmp_tokens[1]));
         r->setNnode(add_node(tmp_tokens[2]));
         r->setValue(to_double(tmp_tokens[3]));
+        _db->_dev_idx["L"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
       } else if (first_letter == 'K'){
         Mutual* r = new Mutual(dev_name);
         r->setInd1(tmp_tokens[1] + "#" + instance_name);
         r->setInd2(tmp_tokens[2] + "#" + instance_name);
         r->setValue(to_double(tmp_tokens[3]));
+        _db->_dev_idx["K"].emplace(_db->_dev_list.size());
         _db->_dev_list.emplace_back(r);
       } else if (first_letter == 'X') {
         Subckt s;
         s.instantiate(whole_line , filename, _db);
-      } else {
+      } else if (first_letter == 'E') {
+        Vcvs* e = new Vcvs(dev_name);
+        e->setPnode(add_node(tokens[1]));
+        e->setNnode(add_node(tokens[2]));
+        e->setCtrlPnode(add_node(tokens[3]));  
+        e->setCtrlNnode(add_node(tokens[4]));   
+        e->setValue(to_double(tokens[5]));
+        _db->_dev_idx["E"].emplace(_db->_dev_list.size());
+        _db->_dev_list.push_back(e);
+      } else if (first_letter == 'G'){
+      Vccs* g = new Vccs(dev_name);
+      g->setPnode(add_node(tokens[1]));
+      g->setNnode(add_node(tokens[2]));
+      g->setCtrlPnode(add_node(tokens[3]));  
+      g->setCtrlNnode(add_node(tokens[4]));   
+      g->setValue(to_double(tokens[5]));
+      _db->_dev_idx["G"].emplace(_db->_dev_list.size());
+      _db->_dev_list.push_back(g);
+    } else if (first_letter == 'H') {
+      Ccvs* h = new Ccvs(dev_name);
+      h->setPnode(add_node(tokens[1]));
+      h->setNnode(add_node(tokens[2]));
+      h->setCtrlName(tokens[3] + "#" + instance_name);
+      h->setValue(to_double(tokens[4]));
+    } else if (first_letter == 'F') {
+      Cccs*  f = new Cccs(dev_name);
+      f->setPnode(add_node(tokens[1]));
+      f->setNnode(add_node(tokens[2]));
+      f->setCtrlName(tokens[3] + "#" + instance_name);
+      f->setValue(to_double(tokens[4]));    
+    } else {
         if (tmp_tokens[0] == ".END" || tmp_tokens[0] == ".ENDS") {
           break;
         } else if (tmp_tokens[0] == ".SUBCKT") {

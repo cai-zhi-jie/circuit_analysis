@@ -10,6 +10,18 @@
 db/device.hpp
 ../db/db/device.hpp
 
+../db/cccs.hpp
+db/ctrlsrc.hpp
+../db/db/ctrlsrc.hpp
+
+../db/ccvs.hpp
+db/ctrlsrc.hpp
+../db/db/ctrlsrc.hpp
+
+../db/ctrlsrc.hpp
+db/device.hpp
+../db/db/device.hpp
+
 ../db/device.hpp
 iostream
 -
@@ -34,14 +46,28 @@ db/device.hpp
 db/device.hpp
 ../db/db/device.hpp
 
+../db/vccs.hpp
+db/ctrlsrc.hpp
+../db/db/ctrlsrc.hpp
+
+../db/vcvs.hpp
+string
+-
+db/ctrlsrc.hpp
+../db/db/ctrlsrc.hpp
+
 ../db/vsrc.hpp
 db/device.hpp
 ../db/db/device.hpp
 
 ../utils/mat.hpp
-cstring
+fstream
+-
+iomanip
 -
 map
+-
+string
 -
 
 /mnt/d/workspace/circuit_analysis/project1/src/db/db.hpp
@@ -55,6 +81,12 @@ vector
 -
 db/cap.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/db/cap.hpp
+db/cccs.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/db/db/cccs.hpp
+db/ccvs.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/db/db/ccvs.hpp
+db/ctrlsrc.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/db/db/ctrlsrc.hpp
 db/device.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/db/device.hpp
 db/ind.hpp
@@ -67,6 +99,10 @@ db/res.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/db/res.hpp
 db/vsrc.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/db/vsrc.hpp
+db/vccs.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/db/db/vccs.hpp
+db/vcvs.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/db/db/vcvs.hpp
 utils/mat.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/utils/mat.hpp
 
@@ -85,6 +121,8 @@ stamp.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/stamp.hpp
 
 /mnt/d/workspace/circuit_analysis/project1/src/stamp.hpp
+cmath
+-
 map
 -
 fstream

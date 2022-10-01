@@ -2,25 +2,18 @@
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 10:48:08 
  * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 22:53:52
+ * @Last Modified time: 2022-09-30 23:58:16
  */
 #pragma once
 
+#include <cmath>
 #include <map>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-// #include "db/cap.hpp"
-// #include "db/device.hpp"
-// #include "db/ind.hpp"
-// #include "db/isrc.hpp"
-// #include "db/mut.hpp"
-// #include "db/res.hpp"
-// #include "db/vsrc.hpp"
 
-// #include "utils/mat.hpp"
 #include "db/db.hpp"
 #include "db/subckt.hpp"
 #include "utils/util.hpp"
@@ -39,15 +32,7 @@ private:
 };
 
 void Stamp::setup(){
-  int n = static_cast<int>(_db->_node_list.size()) - 1;
-  _db->_C = Matrix(n,n);
-  _db->_G = Matrix(n,n);
-  _db->_B = Matrix(n, _db->_num_in);
-  _db->_LT = Matrix(_db->_num_out, n);
-  for(size_t i=0; i < _db->_dev_list.size(); ++i){
-    _db->_dev_list[i]->stamp(_db->_C, _db->_G, _db->_B);
-  }
-  _db->show();
+  _db->setup();
 }
 
 
@@ -62,7 +47,8 @@ void Stamp::setup(){
 /// \todo Please fill in this function. 
 void Stamp::output(char* filename)
 {
-  
+  std::remove(filename);
+  _db->output(filename);
 }
 
 void Stamp::parse(char* filename)
@@ -75,7 +61,8 @@ void Stamp::parse(char* filename)
   std::string delims(" \n\r()\t");
   _db->_node_list["0"] = 0;
   
-  auto add_node = [](std::map<std::string, int>& nl, std::string& name)->int{
+  auto add_node = [](std::map<std::string, int>& nl, std::string name)->int{
+    if (name == "0") return 0;
     if(nl.find(name) == nl.end()) {
       nl[name] = nl.size();
     }
@@ -99,12 +86,14 @@ void Stamp::parse(char* filename)
       r->setPnode(add_node(_db->_node_list, tokens[1]));
       r->setNnode(add_node(_db->_node_list, tokens[2]));
       r->setValue(to_double(tokens[3]));
+      _db->_dev_idx["R"].emplace(_db->_dev_list.size());
       _db->_dev_list.emplace_back(r);
     } else if (first_letter == 'C'){
       Capacitor* r = new Capacitor(tokens[0]);
       r->setPnode(add_node(_db->_node_list, tokens[1]));
       r->setNnode(add_node(_db->_node_list, tokens[2]));
-      r->setValue(to_double(tokens[3]));      
+      r->setValue(to_double(tokens[3]));  
+      _db->_dev_idx["C"].emplace(_db->_dev_list.size());    
       _db->_dev_list.emplace_back(r);
     } else if (first_letter == 'I'){
       Isrc* r = new Isrc(tokens[0]);
@@ -114,6 +103,7 @@ void Stamp::parse(char* filename)
         r->setType(tokens[3]);
       }
       r->setValue(to_double(tokens.back()));
+      _db->_dev_idx["I"].emplace(_db->_dev_list.size());
       _db->_dev_list.emplace_back(r);
       (_db->_num_in)++;
     } else if (first_letter == 'V'){
@@ -124,6 +114,7 @@ void Stamp::parse(char* filename)
         r->setType(tokens[3]);
       }
       r->setValue(to_double(tokens.back()));
+      _db->_dev_idx["V"].emplace(_db->_dev_list.size());
       _db->_dev_list.emplace_back(r);
       (_db->_num_in)++;
     } else if (first_letter == 'L'){
@@ -131,16 +122,48 @@ void Stamp::parse(char* filename)
       r->setPnode(add_node(_db->_node_list, tokens[1]));
       r->setNnode(add_node(_db->_node_list, tokens[2]));
       r->setValue(to_double(tokens[3]));
+      _db->_dev_idx["L"].emplace(_db->_dev_list.size());
       _db->_dev_list.emplace_back(r);
     } else if (first_letter == 'K'){
       Mutual* r = new Mutual(tokens[0]);
       r->setInd1(tokens[1]);
       r->setInd2(tokens[2]);
       r->setValue(to_double(tokens[3]));
+      _db->_dev_idx["K"].emplace(_db->_dev_list.size());
       _db->_dev_list.emplace_back(r);
     } else if (first_letter == 'X') {
       Subckt s;
       s.instantiate(whole_line , filename, _db);
+    } else if (first_letter == 'G'){
+      Vccs* g = new Vccs(tokens[0]);
+      g->setPnode(add_node(_db->_node_list, tokens[1]));
+      g->setNnode(add_node(_db->_node_list, tokens[2]));
+      g->setCtrlPnode(add_node(_db->_node_list, tokens[3]));  
+      g->setCtrlNnode(add_node(_db->_node_list, tokens[4]));   
+      g->setValue(to_double(tokens[5]));
+      _db->_dev_idx["G"].emplace(_db->_dev_list.size());
+      _db->_dev_list.push_back(g);
+    } else if (first_letter == 'E') {
+      Vcvs* e = new Vcvs(tokens[0]);
+      e->setPnode(add_node(_db->_node_list, tokens[1]));
+      e->setNnode(add_node(_db->_node_list, tokens[2]));
+      e->setCtrlPnode(add_node(_db->_node_list, tokens[3]));  
+      e->setCtrlNnode(add_node(_db->_node_list, tokens[4]));   
+      e->setValue(to_double(tokens[5]));
+      _db->_dev_idx["E"].emplace(_db->_dev_list.size());
+      _db->_dev_list.push_back(e);
+    } else if (first_letter == 'H') {
+      Ccvs* h = new Ccvs(tokens[0]);
+      h->setPnode(add_node(_db->_node_list, tokens[1]));
+      h->setNnode(add_node(_db->_node_list, tokens[2]));
+      h->setCtrlName(tokens[3]);
+      h->setValue(to_double(tokens[4]));
+    } else if (first_letter == 'F') {
+      Cccs*  f = new Cccs(tokens[0]);
+      f->setPnode(add_node(_db->_node_list, tokens[1]));
+      f->setNnode(add_node(_db->_node_list, tokens[2]));
+      f->setCtrlName(tokens[3]);
+      f->setValue(to_double(tokens[4]));      
     } else {
       // netlist file ends
       if (tokens[0] == ".END") {
@@ -175,21 +198,99 @@ void Stamp::parse(char* filename)
   }
   ifid.close();
 
-  //aux_node
-  for (auto d : _db->_dev_list) {
-    std::string dev_name = d->getName();
-    if (dev_name[0] == 'L') {
-      Inductor* l = dynamic_cast<Inductor*>(d);
-      std::string tmp = "i:" + dev_name;
-      add_node(_db->_aux_node_list, tmp);
-      l->setAux(_db->_aux_node_list[tmp]);
-    } else if(dev_name[0] == 'V') {
-      Vsrc* v = dynamic_cast<Vsrc*>(d);
-      std::string tmp = "i:" + dev_name;
-      add_node(_db->_aux_node_list, tmp);
-      v->setAux(_db->_aux_node_list[tmp]);
-    }
 
+  for (int i = 0; i < _db->_dev_list.size(); i++) {
+    _db->_dev_name2dev_idx[_db->_dev_list[i]->getName()] = i;
+  }
+  // post process
+  _db->_num_node = _db->_num_act_node = _db->_node_list.size();
+  for (auto id : _db->_dev_idx["L"]) {
+    Inductor* l = dynamic_cast<Inductor*>(_db->_dev_list[id]);
+    std::string tmp = "I<" + l->getName() + ">";
+    add_node(_db->_aux_node_list["L"], tmp);
+    _db->_aux_node_list["L"][tmp] += _db->_num_node;
+    l->setAuxName(tmp);
+    l->setAux(_db->_aux_node_list["L"][tmp]);
+  }
+  _db->_num_node += _db->_aux_node_list["L"].size();
+  int src_id = 1;
+  for (auto id : _db->_dev_idx["I"]) {
+    Isrc* i = dynamic_cast<Isrc*>(_db->_dev_list[id]);
+    i->setSrcIdx(src_id++);
+  }
+  for (auto id : _db->_dev_idx["V"]) {
+    Vsrc* v = dynamic_cast<Vsrc*>(_db->_dev_list[id]);
+    std::string tmp = "I<" + v->getName() + ">";
+    add_node(_db->_aux_node_list["V"], tmp);
+    _db->_aux_node_list["V"][tmp] += _db->_num_node;
+    v->setAuxName(tmp);
+    v->setAux(_db->_aux_node_list["V"][tmp]);
+    v->setSrcIdx(src_id++);
+  }
+  _db->_num_node += _db->_aux_node_list["V"].size();
+  for (auto id : _db->_dev_idx["E"]) {
+    Vcvs* e = dynamic_cast<Vcvs*>(_db->_dev_list[id]);
+    std::string tmp = "I<" + e->getName() + ">";
+    add_node(_db->_aux_node_list["E"], tmp);
+    _db->_aux_node_list["E"][tmp] += _db->_num_node;
+    e->setAux(_db->_aux_node_list["E"][tmp]);
+  }
+  _db->_num_node += _db->_aux_node_list["E"].size();
+
+  // get device by name
+  for (auto id : _db->_dev_idx["K"]) {
+    Mutual* m = dynamic_cast<Mutual*>(_db->_dev_list[id]);
+    Inductor* l1 = dynamic_cast<Inductor*>(_db->_dev_list[_db->_dev_name2dev_idx[m->getInd1()]]);
+    m->setAuxPos(l1->getAux());
+    Inductor* l2 = dynamic_cast<Inductor*>(_db->_dev_list[_db->_dev_name2dev_idx[m->getInd2()]]);
+    m->setAuxNeg(l2->getAux());
+    m->setMutValue(m->getValue() * sqrt(l1->getValue() * l2->getValue()));
   }
 
+  for (auto id : _db->_dev_idx["H"]) {
+    Ccvs *h = dynamic_cast<Ccvs*>(_db->_dev_list[id]);
+    std::string tmp = "I<" + h->getName() + ">";
+    add_node(_db->_aux_node_list["H"], tmp);
+    _db->_aux_node_list["H"][tmp] = (_db->_num_node)++;
+    h->setAuxName(tmp);
+    h->setAux(_db->_aux_node_list["H"][tmp]);
+
+    int cid = _db->_dev_name2dev_idx[h->getCtrlName()];
+    Device* d = _db->_dev_list[cid];
+    h->setCtrlValue(d->getValue());
+    if (d->existAux() == false) {
+      h->setExistCtrlAux(false);
+
+      tmp = "I<" + d->getName() + ">";
+      std::string type(1,d->getName()[0]);
+      add_node(_db->_aux_node_list[type], tmp);
+      _db->_aux_node_list[type][tmp] = (_db->_num_node)++;
+      d->setAuxName(tmp);
+      d->setAux(_db->_aux_node_list[type][tmp]);
+    } else {
+      h->setExistCtrlAux(true);
+    }
+    h->setCtrlAux(d->getAux());
+  }
+  
+  for (auto id : _db->_dev_idx["F"]) {
+    Cccs *f = dynamic_cast<Cccs*>(_db->_dev_list[id]);
+
+    int cid = _db->_dev_name2dev_idx[f->getCtrlName()];
+    Device* d = _db->_dev_list[cid];
+    f->setCtrlValue(d->getValue());
+    if (d->existAux() == false) {
+      f->setExistCtrlAux(false);
+      std::string tmp = "I<" + d->getName() + ">";
+      std::string type(1,d->getName()[0]);
+      add_node(_db->_aux_node_list[type], tmp);
+      _db->_aux_node_list[type][tmp] = (_db->_num_node)++;
+      d->setAuxName(tmp);
+      d->setAux(_db->_aux_node_list[type][tmp]);
+    } else {
+      f->setExistCtrlAux(true);
+    }
+    f->setCtrlAux(d->getAux());
+  }
+    
 }

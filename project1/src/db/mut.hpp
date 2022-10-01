@@ -23,71 +23,35 @@
 class Mutual : public Device
 {
 public:
-  /// \brief Constructor
-  /// \param name name of the mutual inductance
   Mutual(const std::string &name) : Device(name) {}
-
-  /// \brief stamping function of the mutual inductance
-  ///
-  /// @param C system matrix \f$ C \f$
-  /// @param G system matrix \f$ G \f$
-  /// @param B system matrix \f$ B \f$
-  ///
-  /// \todo You have to fills in each stamp function.
-  ///
-  virtual void stamp(Matrix &C, Matrix &G, Matrix &B);
-
-  /// \brief Destructor
   virtual ~Mutual() {}
 
-  /// \brief return the auxiliary current node  of L1
-  /// @return auxiliary current node of L1
-  int auxPosNode() const { return _aux_node_pos; }
+  virtual void stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U);
 
-  /// \brief set the auxiliary current node  of L1
-  /// @param s auxiliary current node of L1
+  int getAuxPosNode() const { return _aux_node_pos; }
   void setAuxPos(int s) { _aux_node_pos = s; }
-
-  /// \brief return the auxiliary current node  of L2
-  /// @return auxiliary current node of L2
-  int auxNegNode() const { return _aux_node_neg; }
-
-  /// \brief set the auxiliary current node  of L2
-  /// @param s auxiliary current node of L2
+  int getAuxNegNode() const { return _aux_node_neg; }
   void setAuxNeg(int s) { _aux_node_neg = s; }
-
-  /// \brief return the name of L1
-  /// @return name of inductor L1
-  std::string ind1() const { return _ind1; }
-
-  /// \brief set the name of L1
-  /// @param l  name of inductor L1
+  std::string getInd1() const { return _ind1; }
   void setInd1(const std::string &l) { _ind1 = l; }
-
-  /// \brief return the name of L2
-  /// @return name of inductor L2
-  std::string ind2() const { return _ind2; }
-
-  /// \brief set the name of L2
-  /// @param l  name of inductor L2
+  std::string getInd2() const { return _ind2; }
   void setInd2(const std::string &l) { _ind2 = l; }
+  double getMutValue() const { return _mut_value; }
+  void setMutValue(double m) { _mut_value = m; }
 
 private:
-  /// \brief auxiliary current node of L1
+  double _mut_value;
   int _aux_node_pos;
-
-  /// \brief auxiliary current node of L2
   int _aux_node_neg;
-
-  /// \brief name of inductor L1
   std::string _ind1;
-
-  /// \brief name of inductor L2
   std::string _ind2;
+  
 };
 
-void Mutual::stamp(Matrix &C, Matrix &G, Matrix &B)
+void Mutual::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U)
 {
-  // to be implemented
-  std::cout << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _value << std::endl;
+  
+  C.add(_aux_node_pos, _aux_node_neg, -_mut_value);
+  C.add(_aux_node_neg, _aux_node_pos, -_mut_value);
+  std::cout << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _aux_node_pos << " " << _aux_node_neg << " " << _mut_value << " " << _value << std::endl;
 }

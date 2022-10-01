@@ -3,11 +3,16 @@
 
 CMakeFiles/MNA.dir/main.cpp.o
  ../db/cap.hpp
+ ../db/cccs.hpp
+ ../db/ccvs.hpp
+ ../db/ctrlsrc.hpp
  ../db/device.hpp
  ../db/ind.hpp
  ../db/isrc.hpp
  ../db/mut.hpp
  ../db/res.hpp
+ ../db/vccs.hpp
+ ../db/vcvs.hpp
  ../db/vsrc.hpp
  ../utils/mat.hpp
  /mnt/d/workspace/circuit_analysis/project1/src/db/db.hpp
