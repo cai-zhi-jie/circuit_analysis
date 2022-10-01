@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai
  * @Date: 2022-09-28 13:14:21
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 14:14:20
+ * @Description: 
  */
 #pragma once
 
@@ -23,7 +22,7 @@ void Resistor::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string
   if (_nnode == 0 && _pnode == 0) {
     // short to "0" GROUND
   } else if (_nnode == 0 || _pnode == 0) {
-    int nid = _nnode + _pnode - 1;
+    int nid = _nnode + _pnode;
     G.add(nid, nid, 1.0 / _value);
   } else {
     G.add(_pnode, _pnode, 1.0 / _value);
@@ -31,5 +30,5 @@ void Resistor::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string
     G.add(_pnode, _nnode, -1.0 / _value);
     G.add(_nnode, _pnode, -1.0 / _value);
   }
-  std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << std::endl;
+  // std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << std::endl;
 }

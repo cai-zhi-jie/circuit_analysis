@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai 
  * @Date: 2022-09-28 14:14:43 
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-30 23:45:40
+ * @Description: 
  */
 #pragma once
 
@@ -39,7 +38,7 @@ public:
 
   void show();
   void setup();
-  void output(std::string fn);
+  void output(std::string fn, bool sparse_output = false);
   
   std::vector<Device*> _dev_list;
   std::map<std::string,std::set<int>> _dev_idx;
@@ -95,11 +94,11 @@ void DB::setup() {
   }
   for (int i = 0; i < _probe_list.size(); i++) {
     _Y.add(i + 1, 1, _X.get(_probe_list[i], 1));
+    _LT.add(i + 1, _probe_list[i], 1);
   }
   for(auto d : _dev_list){
     d->stamp(_C, _G, _B, _I, _U);
   }
-  show();
 }
 
 void DB::show() {
@@ -120,13 +119,24 @@ void DB::show() {
   }
 }
 
-void DB::output(std::string fn) {
-  _C.output(fn);
-  _G.output(fn);
-  _B.output(fn);
-  _LT.output(fn);
-  _X.output(fn, 12);
-  _Y.output(fn, 12);
-  _U.output(fn, 12);
-  _I.output(fn);
+void DB::output(std::string fn, bool sparse_output) {
+  if (sparse_output) {
+    _C.sparse_output(fn);
+    _G.sparse_output(fn);
+    _B.sparse_output(fn);
+    _LT.sparse_output(fn);
+    _X.sparse_output(fn);
+    _Y.sparse_output(fn);
+    _U.sparse_output(fn);
+    _I.sparse_output(fn);
+  } else {
+    _C.output(fn);
+    _G.output(fn);
+    _B.output(fn);
+    _LT.output(fn);
+    _X.output(fn, 12);
+    _Y.output(fn, 12);
+    _U.output(fn, 12);
+    _I.output(fn);
+  }
 }

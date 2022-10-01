@@ -36,6 +36,4 @@ protected:
   int _ctrl_nnode;
   int _ctrl_pnode;
   std::string _ctrl_name;
-
-  /* data */
 };

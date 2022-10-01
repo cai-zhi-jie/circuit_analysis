@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 11:07:09 
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-27 16:12:35
+ * @Description: 
  */
 #pragma once
 
@@ -93,7 +92,7 @@ void Mat<T>::sparse_output(std::string fn) {
     auto& row = rp.second;
     for (auto& e : row) {
       int cid = e.first;
-      fout << "(" << rid << ", " << cid << ") " << e.second << "\t";
+      fout << "(" << rid << ", " << cid << ") " << e.second << std::endl;
     }
   }
   fout.close();

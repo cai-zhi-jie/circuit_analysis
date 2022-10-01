@@ -1,25 +1,12 @@
 /*
  * @Author: Zhijie Cai
  * @Date: 2022-09-28 13:08:08
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 13:13:46
+ * @Description: 
  */
 
 #pragma once
 
 #include "db/device.hpp"
-
-/// \class Mutual
-///
-/// \brief The mutual inductance between two inductors
-///
-/// An Mutual instance corrsponds to the "k1 l1 l2 0.5" card in the SPICE netlist
-/// It records the information of the mutual inductance. Differnt from other devices
-/// in the SPICE netlist, the mutual inductance doesn't have the concept of pins.
-/// Instead, it records the name of two inductors which will also appear in the
-/// the netlist. However, it is not sure that the two inductors will appear before or
-/// after the mutual indectance card. so we have to record the name of these two inductors.
-/// Additionally, we also have to record currents through the inductors as auxiliary vairiables.
 class Mutual : public Device
 {
 public:
@@ -50,8 +37,7 @@ private:
 
 void Mutual::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U)
 {
-  
   C.add(_aux_node_pos, _aux_node_neg, -_mut_value);
   C.add(_aux_node_neg, _aux_node_pos, -_mut_value);
-  std::cout << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _aux_node_pos << " " << _aux_node_neg << " " << _mut_value << " " << _value << std::endl;
+  // std::cout << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _aux_node_pos << " " << _aux_node_neg << " " << _mut_value << " " << _value << std::endl;
 }

@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 10:48:08 
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-30 23:58:16
+ * @Description: 
  */
 #pragma once
 
@@ -24,7 +23,7 @@ public:
   ~Stamp() {}
 
   void parse(char* filename);
-  void output(char* filename);
+  void output(char* filename, bool sparse_output = false);
   void setup();
  
 private:
@@ -35,20 +34,10 @@ void Stamp::setup(){
   _db->setup();
 }
 
-
-/// \brief Output the system matrix to disk
-///
-/// @param filename output file name
-///
-/// This function will write the system matrix to the disk. 
-/// Binary file format is preferred over the ASCII one. Sparse
-/// matrix structure is preferred over the dense one. 
-/// 
-/// \todo Please fill in this function. 
-void Stamp::output(char* filename)
+void Stamp::output(char* filename, bool sparse_output)
 {
   std::remove(filename);
-  _db->output(filename);
+  _db->output(filename, sparse_output);
 }
 
 void Stamp::parse(char* filename)

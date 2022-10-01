@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai
  * @Date: 2022-09-28 12:54:11
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 14:14:15
+ * @Description: 
  */
 
 #pragma once
@@ -38,5 +37,5 @@ void Isrc::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U
   }
   I.add(_src_idx, 1, _value);
   U.add(_src_idx, 1, _name);
-  std::cout << _name << " " << _pnode << " " << _nnode << " " << _src_idx << " " << _value << std::endl;
+  // std::cout << _name << " " << _pnode << " " << _nnode << " " << _src_idx << " " << _value << std::endl;
 }

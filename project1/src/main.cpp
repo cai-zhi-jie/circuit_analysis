@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai 
  * @Date: 2022-09-27 11:46:34 
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 14:57:08
+ * @Description: 
  */
 
 #include <iostream>
@@ -15,7 +14,11 @@ int main(int argc, char* argv[]){
     std::cout<<"usage: stamp input_file output_file"<<std::endl;
     return 1;
   }
-
+  bool sparse_output = false;
+  for(int i = 3; i < argc; i++){
+    auto option = static_cast<std::string>(argv[i]);
+    if(option == "-sparse_output") sparse_output = true;
+  }
   Stamp s;
   
   /// phase 1: parsing the netlist
@@ -25,7 +28,7 @@ int main(int argc, char* argv[]){
   s.setup();
   
   /// phase 3: output
-  s.output(argv[2]);
+  s.output(argv[2], sparse_output);
 	
   return 0;
 }

@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai
  * @Date: 2022-09-27 14:09:23
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-30 23:25:32
+ * @Description: 
  */
 #pragma once
 
@@ -30,5 +29,5 @@ void Capacitor::stamp(Matrix& C, Matrix& G, Matrix& B, Matrix& I, Mat<std::strin
     C.add(_pnode, _nnode, -_value);
     C.add(_nnode, _pnode, -_value);
   }
-  std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << std::endl;
+  // std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << std::endl;
 }

@@ -1,8 +1,7 @@
 /*
  * @Author: Zhijie Cai
  * @Date: 2022-09-27 14:10:56
- * @Last Modified by: Zhijie Cai
- * @Last Modified time: 2022-09-28 14:14:11
+ * @Description: 
  */
 
 #pragma once
@@ -34,5 +33,5 @@ void Inductor::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string
     G.add(_nnode, _aux_node, -1);
     G.add(_aux_node, _nnode, 1);
   }
-  std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _aux_node << " " << _value << std::endl;
+  // std::cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _aux_node << " " << _value << std::endl;
 }
