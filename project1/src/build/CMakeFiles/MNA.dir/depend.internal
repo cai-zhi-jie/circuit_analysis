@@ -15,8 +15,10 @@ CMakeFiles/MNA.dir/main.cpp.o
  ../db/vcvs.hpp
  ../db/vsrc.hpp
  ../utils/mat.hpp
+ ../utils/timer.hpp
  /mnt/d/workspace/circuit_analysis/project1/src/db/db.hpp
  /mnt/d/workspace/circuit_analysis/project1/src/db/subckt.hpp
  /mnt/d/workspace/circuit_analysis/project1/src/main.cpp
  /mnt/d/workspace/circuit_analysis/project1/src/stamp.hpp
+ /mnt/d/workspace/circuit_analysis/project1/src/utils/log.hpp
  /mnt/d/workspace/circuit_analysis/project1/src/utils/util.hpp

@@ -14,9 +14,11 @@ CMakeFiles/MNA.dir/main.cpp.o: ../db/vccs.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../db/vcvs.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../db/vsrc.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../utils/mat.hpp
+CMakeFiles/MNA.dir/main.cpp.o: ../utils/timer.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../db/db.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../db/subckt.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../main.cpp
 CMakeFiles/MNA.dir/main.cpp.o: ../stamp.hpp
+CMakeFiles/MNA.dir/main.cpp.o: ../utils/log.hpp
 CMakeFiles/MNA.dir/main.cpp.o: ../utils/util.hpp
 

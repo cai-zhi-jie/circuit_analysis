@@ -22,8 +22,8 @@ public:
   Stamp() { _db = std::make_shared<DB>(); }
   ~Stamp() {}
 
-  void parse(char* filename);
-  void output(char* filename, bool sparse_output = false);
+  void parse(std::string filename);
+  void output(std::string filename, bool sparse_output = false);
   void setup();
  
 private:
@@ -34,13 +34,12 @@ void Stamp::setup(){
   _db->setup();
 }
 
-void Stamp::output(char* filename, bool sparse_output)
+void Stamp::output(std::string filename, bool sparse_output)
 {
-  std::remove(filename);
   _db->output(filename, sparse_output);
 }
 
-void Stamp::parse(char* filename)
+void Stamp::parse(std::string filename)
 {
   std::ifstream ifid(filename);
   _db->_num_in = 0;
@@ -230,9 +229,9 @@ void Stamp::parse(char* filename)
   for (auto id : _db->_dev_idx["K"]) {
     Mutual* m = dynamic_cast<Mutual*>(_db->_dev_list[id]);
     Inductor* l1 = dynamic_cast<Inductor*>(_db->_dev_list[_db->_dev_name2dev_idx[m->getInd1()]]);
-    m->setAuxPos(l1->getAux());
+    m->setAuxInd1(l1->getAux());
     Inductor* l2 = dynamic_cast<Inductor*>(_db->_dev_list[_db->_dev_name2dev_idx[m->getInd2()]]);
-    m->setAuxNeg(l2->getAux());
+    m->setAuxInd2(l2->getAux());
     m->setMutValue(m->getValue() * sqrt(l1->getValue() * l2->getValue()));
   }
 
@@ -281,5 +280,6 @@ void Stamp::parse(char* filename)
     }
     f->setCtrlAux(d->getAux());
   }
-    
+
+  _db->_num_aux_node = _db->_num_node - _db->_num_act_node;   
 }

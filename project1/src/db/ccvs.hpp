@@ -37,12 +37,12 @@ private:
 void Ccvs::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U) {
   // Vp - Vn = value * Ictrl
   G.add(_aux_node, _pnode, 1);
-  G.add(_aux_node, _nnode, 1);
+  G.add(_aux_node, _nnode, -1);
   G.add(_aux_node, _ctrl_aux_node, -_value);
-  // current flow out is positive
-  G.add(_pnode, _aux_node, 1);
   // current flow out is negative
-  G.add(_nnode, _aux_node, -1);
+  G.add(_pnode, _aux_node, -1);
+  // current flow out is positive
+  G.add(_nnode, _aux_node, 1);
   // deal with the control aux node
   if (_exist_ctrl_aux == false)  {
      if(_ctrl_name[0]=='R') { 

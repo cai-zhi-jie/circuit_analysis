@@ -27,25 +27,21 @@ public:
 
 
 private:
-
   bool _exist_ctrl_aux;
   int _ctrl_aux_node;
   double _ctrl_value;
   std::string _ctrl_name;
 
 };
+
 void Cccs::stamp(Matrix &C, Matrix &G, Matrix &B, Matrix& I, Mat<std::string>& U) {
   // Icccs = F * Ictrl
   // current flow out is positive
   G.add(_pnode, _ctrl_aux_node, _value);
   // current flow out is negative
   G.add(_nnode, _ctrl_aux_node, -_value);
- 
-  // Usually the control device is a voltage source, so 
-  // the auxnode must exist before this step. But the if 
-  // the device is a resistor or capacitor, which means 
-  // the auxnode of the ctrl I does not exist,
-  // we have to calculate the current by circuit equation
+  // if the control source is not a voltage source
+  // adding aux_node for it (like R\C)
   // (eg: Vcp - Vcn  = Ictrl * Rctrl_)
   if(_exist_ctrl_aux == false) {
      if(_ctrl_name[0]=='R') { 

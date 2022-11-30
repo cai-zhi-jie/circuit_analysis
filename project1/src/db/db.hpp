@@ -59,6 +59,14 @@ public:
   Mat<std::string> _Y;
   Mat<std::string> _U;
 
+  Matrix subC;
+  Matrix subL;
+  Matrix subG;
+  Matrix subE;
+  Matrix subET;
+  Mat<std::string> subV;
+  Mat<std::string> subI;
+
   int _num_in;
   int _num_out;
   std::vector<int> _src_list;
@@ -84,6 +92,14 @@ void DB::setup() {
   _X = Mat<std::string>(_num_node - 1, 1, "X");
   _Y = Mat<std::string>(_num_out, 1, "Y");
   _U = Mat<std::string>(_num_in, 1, "U");
+  
+  subC = Matrix(_num_act_node - 1, _num_act_node - 1, "subC");
+  subL = Matrix(_num_aux_node, _num_aux_node, "subL");
+  subG = Matrix(_num_act_node - 1, _num_act_node - 1, "subG");
+  subE = Matrix(_num_act_node - 1, _num_aux_node, "subE");
+  subET = Matrix(_num_aux_node, _num_act_node - 1, "sub-E^T");
+  subV = Mat<std::string>(_num_act_node - 1, 1, "subV");
+  subI = Mat<std::string>(_num_aux_node, 1, "subI");
   for (auto p : _node_list) {
     _X.add(p.second, 1, "V<" + p.first + ">");
   }
@@ -120,23 +136,69 @@ void DB::show() {
 }
 
 void DB::output(std::string fn, bool sparse_output) {
+  // output full matrix in txt
+  std::string fn_tmp = fn + "_full.txt";
+  std::remove(fn_tmp.c_str());
+  _C.output(fn_tmp);
+  _G.output(fn_tmp);
+  _B.output(fn_tmp);
+  _LT.output(fn_tmp);
+  _X.output(fn_tmp, 12);
+  _Y.output(fn_tmp, 12);
+  _U.output(fn_tmp, 12);
+  _I.output(fn_tmp);
+  // output sparse matrix in binary
+  fn_tmp = fn + "_binary.dat";
+  std::remove(fn_tmp.c_str());
+  _C.binary_output(fn_tmp);
+  _G.binary_output(fn_tmp);
+  _B.binary_output(fn_tmp);
+  _LT.binary_output(fn_tmp);
+  _X.binary_output(fn_tmp);
+  _Y.binary_output(fn_tmp);
+  _U.binary_output(fn_tmp);
+  _I.binary_output(fn_tmp);
+  // output sparse matrix in txt
   if (sparse_output) {
-    _C.sparse_output(fn);
-    _G.sparse_output(fn);
-    _B.sparse_output(fn);
-    _LT.sparse_output(fn);
-    _X.sparse_output(fn);
-    _Y.sparse_output(fn);
-    _U.sparse_output(fn);
-    _I.sparse_output(fn);
-  } else {
-    _C.output(fn);
-    _G.output(fn);
-    _B.output(fn);
-    _LT.output(fn);
-    _X.output(fn, 12);
-    _Y.output(fn, 12);
-    _U.output(fn, 12);
-    _I.output(fn);
+    fn_tmp = fn + "_sparse.txt";
+    std::remove(fn_tmp.c_str());
+    _C.sparse_output(fn_tmp);
+    _G.sparse_output(fn_tmp);
+    _B.sparse_output(fn_tmp);
+    _LT.sparse_output(fn_tmp);
+    _X.sparse_output(fn_tmp);
+    _Y.sparse_output(fn_tmp);
+    _U.sparse_output(fn_tmp);
+    _I.sparse_output(fn_tmp);
   }
+  // output sub matrix
+  fn_tmp = fn + "_sub_matrix.txt";
+  std::remove(fn_tmp.c_str());
+  _C.getSubMatrix(1, 1, _num_act_node-1, _num_act_node-1, subC);
+  _C.getSubMatrix(_num_act_node, _num_act_node, _num_aux_node, _num_aux_node, subL);
+  _G.getSubMatrix(1, 1, _num_act_node-1, _num_act_node-1, subG);
+  _G.getSubMatrix(1, _num_act_node, _num_act_node-1, _num_aux_node, subE);
+  _G.getSubMatrix(_num_act_node, 1, _num_aux_node, _num_act_node-1, subET);
+  _X.getSubMatrix(1, 1, _num_act_node-1, 1, subV);
+  _X.getSubMatrix(_num_act_node, 1, _num_aux_node, 1, subI);
+
+  subC.output(fn_tmp);
+  subL.output(fn_tmp);
+  subG.output(fn_tmp);
+  subE.output(fn_tmp);
+  subET.output(fn_tmp);
+  subV.output(fn_tmp);
+  subI.output(fn_tmp);
+
+  fn_tmp = fn + "_zero.txt";
+  std::remove(fn_tmp.c_str());
+  Matrix zero1(0,0,"zero1");
+  Matrix zero2(0,0,"zero2");
+  Matrix zero3(0,0,"zero3");
+  _C.getSubMatrix(1, _num_act_node, _num_act_node-1, _num_aux_node, zero1);
+  _C.getSubMatrix(_num_act_node, 1, _num_aux_node, _num_act_node-1, zero2);
+  _G.getSubMatrix(_num_act_node, _num_act_node, _num_aux_node, _num_aux_node, zero3);
+  zero1.output(fn_tmp);
+  zero2.output(fn_tmp);
+  zero3.output(fn_tmp);
 }

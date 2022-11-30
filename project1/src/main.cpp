@@ -7,28 +7,34 @@
 #include <iostream>
 
 #include "stamp.hpp"
+#include "utils/log.hpp"
 
 int main(int argc, char* argv[]){
 	
-  if(argc < 3){
-    std::cout<<"usage: stamp input_file output_file"<<std::endl;
+  if(argc < 2){
+    std::cout<<"usage: stamp input_file"<<std::endl;
     return 1;
   }
-  bool sparse_output = false;
-  for(int i = 3; i < argc; i++){
-    auto option = static_cast<std::string>(argv[i]);
-    if(option == "-sparse_output") sparse_output = true;
-  }
+  std::string input_fn(argv[1]);
+  auto idx_begin = input_fn.find_last_of("/") + 1;
+  auto idx_end = input_fn.find_last_of(".");
+  std::string design_name = input_fn.substr(idx_begin, idx_end - idx_begin);
+  // std::cout << design_name << std::endl;
+  bool sparse_output = true;
+  // for(int i = 2; i < argc; i++){
+  //   auto option = static_cast<std::string>(argv[i]);
+  //   if(option == "-sparse_output") sparse_output = true;
+  // }
   Stamp s;
   
   /// phase 1: parsing the netlist
-  s.parse(argv[1]);
+  info::phase("Parse "+ input_fn, [&]() { s.parse(input_fn); });
 
   /// phase 2: stamping
-  s.setup();
+  info::phase("Setup database", [&]() { s.setup(); });
   
   /// phase 3: output
-  s.output(argv[2], sparse_output);
+  info::phase("Output matrix", [&]() { s.output(design_name, sparse_output); });
 	
   return 0;
 }

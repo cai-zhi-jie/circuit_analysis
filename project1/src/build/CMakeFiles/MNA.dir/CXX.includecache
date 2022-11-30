@@ -70,6 +70,10 @@ map
 string
 -
 
+../utils/timer.hpp
+chrono
+-
+
 /mnt/d/workspace/circuit_analysis/project1/src/db/db.hpp
 memory
 -
@@ -119,6 +123,8 @@ iostream
 -
 stamp.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/stamp.hpp
+utils/log.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/utils/log.hpp
 
 /mnt/d/workspace/circuit_analysis/project1/src/stamp.hpp
 cmath
@@ -139,6 +145,18 @@ db/subckt.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/db/subckt.hpp
 utils/util.hpp
 /mnt/d/workspace/circuit_analysis/project1/src/utils/util.hpp
+
+/mnt/d/workspace/circuit_analysis/project1/src/utils/log.hpp
+functional
+-
+iomanip
+-
+iostream
+-
+sstream
+-
+utils/timer.hpp
+/mnt/d/workspace/circuit_analysis/project1/src/utils/utils/timer.hpp
 
 /mnt/d/workspace/circuit_analysis/project1/src/utils/util.hpp
 string

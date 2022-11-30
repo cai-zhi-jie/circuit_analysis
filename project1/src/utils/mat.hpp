@@ -16,16 +16,22 @@ public:
       :_num_row(nrow),_num_col(ncol), _name(name) {}
   ~Mat() {}
   
+  void clear();
   T add(int r, int c, T v);
   T get(int r, int c) { return _matrix[r][c]; }
 
-  void set_row_num(int rn) { _num_row = rn;}
-  int get_row_num() const {return _num_row;}
-  void set_col_num(int cn) { _num_col = cn;}
-  int get_col_num() const {return _num_col;}
+  void setRowNum(int rn) { _num_row = std::max(0, rn);}
+  int getRowNum() const {return _num_row;}
+  void setColNum(int cn) { _num_col = std::max(0, cn);}
+  int getColNum() const {return _num_col;}
+  void setName(std::string n) { _name = n;}
+  std::string getName() const {return _name;}
+
+  void getSubMatrix(int start_row, int star_col, int row_num, int col_num, Mat<T>& sub_mat);
 
   void output(std::string fn, int width = 8, int prec = 3);
   void sparse_output(std::string fn);
+  void binary_output(std::string fn);
 private:
   
   int _num_row;
@@ -33,6 +39,13 @@ private:
   std::string _name;
   std::map<int, std::map<int, T>> _matrix;
 };
+
+template<class T>
+void Mat<T>::clear() {
+  int _num_row = 0;
+  int _num_col = 0;
+  _matrix.clear();  
+}
 
 template<class T>
 T Mat<T>::add(int r, int c, T v) {
@@ -98,6 +111,63 @@ void Mat<T>::sparse_output(std::string fn) {
   fout.close();
 }
 
+template<class T>
+void Mat<T>::binary_output(std::string fn)
+{
+  std::ofstream fout(fn, std::ios::binary | std::ios::app);
+
+  int non_zero_num = 0;
+  for (auto r : _matrix) {
+    non_zero_num += r.second.size();
+  }
+  // std::cout << _num_row << " " << _num_col  << " " << non_zero_num << std::endl;
+  fout.write((char*)&_num_row, sizeof(_num_row));
+  fout.write((char*)&_num_col, sizeof(_num_col));
+  fout.write((char*)&non_zero_num, sizeof(non_zero_num));
+
+  for (auto r : _matrix)  {
+    int rid = r.first;
+    for(auto e : r.second) {
+      int cid = e.first;
+      auto value = e.second;
+      fout.write((char*)&rid, sizeof(rid));
+      fout.write((char*)&cid, sizeof(cid));
+      fout.write((char*)&value, sizeof(value));
+      // std::cout << rid  << "," << cid << "=" << value << std::endl;
+    }
+  }
+
+
+  fout.close();  
+}
+
+
+
+template<class T>
+void Mat<T>::getSubMatrix(int start_row, int start_col, int row_num, int col_num, Mat<T>& sub_mat) {
+  sub_mat.clear();
+  sub_mat.setRowNum(row_num);
+  sub_mat.setColNum(col_num);
+  int end_row = std::min(start_row + row_num, _num_row + 1);
+  int end_col = std::min(start_col + col_num, _num_col + 1);
+  auto in_range = [&](int r, int s, int e)->bool{
+    if (r >= s && r < e) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  for (auto r : _matrix) {
+    int rid = r.first;
+    if (!in_range(rid, start_row, end_row)) continue;
+    for (auto c : r.second) {
+      int cid = c.first;
+      if (!in_range(cid, start_col, end_col)) continue;
+      auto value = c.second;
+      sub_mat.add(rid - start_row + 1, cid - start_col + 1, value);
+    }
+  }
+}
 
 typedef Mat<double> Matrix;
 

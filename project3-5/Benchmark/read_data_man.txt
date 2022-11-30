@@ -1,0 +1,7 @@
+read_data.mexw32是matlab mex函数，用于读取hspice输出*.lis文件中的波形信息。
+使用方法：
+1. 在hspice网表中，利用.print命令，在*.lis文件中打印要观察的波形信息。
+2. 将read_data.mexw32放在hspice输出文件*.lis所在目录。将matlab当前目录切换到*.lis所在目录。
+3. 在Matlab下输入data = read_data('*.lis')即可将*.lis中的波形信息读入到data中。
+其中data的第1列，也就是a(:,1)存储时间数据，其他列也就是a(:,2:end)存储*.lis利用.print命令输出的波形数据。
+
