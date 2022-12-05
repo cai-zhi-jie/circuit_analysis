@@ -1,7 +1,7 @@
 * "simulator" "HSPICE" 
 * "version" "P-2019.06-SP1-1 win64"
 * "format" "HSP"
-* "rundate" "18:31:14 11/08/2022 "
+* "rundate" "16:19:43 11/27/2022 "
 * "netlist" "bus8bit8seg.sp "
 * "runtitle" "*a bus interconnect circuit with 10 bus line 8 segment."
 * time =    0.            

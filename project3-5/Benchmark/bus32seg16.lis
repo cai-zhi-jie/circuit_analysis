@@ -6,12 +6,12 @@
   Synopsys, Inc. All other use, reproduction, or distribution of
   this software is strictly prohibited.
   Input File: bus32seg16.sp                                                     
-  Command line options: C:\synopsys\Hspice_P-2019.06-SP1-1\WIN64\hspice.com -i bus32seg16.sp -o D:\workspace\circuit_analysis\project3-5\Benchmark\bus32seg16.lis
-  Start time: Tue Nov  8 18:30:54 2022
+  Command line options: C:\synopsys\Hspice_P-2019.06-SP1-1\WIN64\hspice.com -i bus32seg16.sp -o D:\workspace\circuit_analysis\project3-5\src\bus32seg16.lis
+  Start time: Sun Nov 27 16:04:05 2022
   lic:  
   lic: FLEXlm: SDK_12.3 
   lic: USER:   44919                HOSTNAME: CZJ 
-  lic: HOSTID: "00155df60778"       PID:      11740 
+  lic: HOSTID: "3cf01186422d"       PID:      3520 
   lic: Using FLEXlm license file: 
   lic: 27000@CZJ 
   lic: Checkout 1 hspice 
@@ -16578,20 +16578,20 @@ y
 
   analysis           time    # points   tot. iter  conv.iter
   op point           0.03           1           1
-  transient          0.64        1001         110          41 rev=         1
-  readin             2.00
-  errchk             0.10
-  setup              0.25
+  transient          0.56        1001         110          41 rev=         1
+  readin             0.90
+  errchk             0.08
+  setup              0.20
   output             0.00
 
 
-           peak memory used        113.47 megabytes
-           total cpu time            3.18 seconds
-           total elapsed time        4.47 seconds
-           job started at     18:30:54 11/08/2022
-           job ended   at     18:30:58 11/08/2022
-           job total runtime         4.47 seconds
+           peak memory used        114.80 megabytes
+           total cpu time            1.90 seconds
+           total elapsed time        2.97 seconds
+           job started at     16:04:05 11/27/2022
+           job ended   at     16:04:08 11/27/2022
+           job total runtime         2.97 seconds
 
 
   lic: Release hspice token(s) 
- lic: total license checkout elapse time:        1.28(s)
+ lic: total license checkout elapse time:        1.07(s)

@@ -35,12 +35,8 @@ for i = 1:n
     if M(i,i) == 0
         for j = 1:n
             if M (j,i) ~= 0
-                temp = M(i,:);
-                M(i,:) = M (j,:);
-                M(j,:) = temp;
-                temp = 	b(i,:);
-                b(i,:) = b(j,:);
-                b(j,:) = temp;
+                M(i,:) = M(i,:) + M(j,:);
+                b(i,:) = b(i,:) + b(j,:);
                 break;
             end
         end
@@ -53,7 +49,6 @@ D = diag(diag(M));
 L = tril(M,-1);
 U = triu(M,1);
 G = inv(D+w*L);
-% G = pinv(D+w*L);
 N = (1-w)*D-w*U;
 
 for i=1:maxIter
@@ -63,4 +58,5 @@ for i=1:maxIter
         break;
     end
 end
+fprintf('(%d/%d)\n',i,maxIter);
 result = x;

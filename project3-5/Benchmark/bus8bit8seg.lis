@@ -6,12 +6,12 @@
   Synopsys, Inc. All other use, reproduction, or distribution of
   this software is strictly prohibited.
   Input File: bus8bit8seg.sp                                                    
-  Command line options: C:\synopsys\Hspice_P-2019.06-SP1-1\WIN64\hspice.com -i bus8bit8seg.sp -o D:\workspace\circuit_analysis\project3-5\Benchmark\bus8bit8seg.lis
-  Start time: Tue Nov  8 18:31:14 2022
+  Command line options: C:\synopsys\Hspice_P-2019.06-SP1-1\WIN64\hspice.com -i bus8bit8seg.sp -o D:\workspace\circuit_analysis\project3-5\src\bus8bit8seg.lis
+  Start time: Sun Nov 27 16:19:43 2022
   lic:  
   lic: FLEXlm: SDK_12.3 
   lic: USER:   44919                HOSTNAME: CZJ 
-  lic: HOSTID: "00155df60778"       PID:      5732 
+  lic: HOSTID: "3cf01186422d"       PID:      21824 
   lic: Using FLEXlm license file: 
   lic: 27000@CZJ 
   lic: Checkout 1 hspice 
@@ -4191,21 +4191,21 @@ y
   ******  Runtime Statistics (seconds)  ******
 
   analysis           time    # points   tot. iter  conv.iter
-  op point           0.02           1           4
-  transient          0.03        1001          82          41 rev=         1
-  readin             0.23
-  errchk             0.02
+  op point           0.01           1           4
+  transient          0.02        1001          82          41 rev=         1
+  readin             0.14
+  errchk             0.01
   setup              0.01
   output             0.00
 
 
-           peak memory used         72.39 megabytes
-           total cpu time            0.37 seconds
-           total elapsed time        1.79 seconds
-           job started at     18:31:14 11/08/2022
-           job ended   at     18:31:16 11/08/2022
-           job total runtime         1.79 seconds
+           peak memory used         71.91 megabytes
+           total cpu time            0.25 seconds
+           total elapsed time        1.40 seconds
+           job started at     16:19:43 11/27/2022
+           job ended   at     16:19:44 11/27/2022
+           job total runtime         1.40 seconds
 
 
   lic: Release hspice token(s) 
- lic: total license checkout elapse time:        1.40(s)
+ lic: total license checkout elapse time:        1.15(s)
