@@ -11,7 +11,7 @@ function [output, source, time] = BackwardEuler(C, G, B, LT, SRC, startTime, end
 nodeNum = size(G, 1);
 outputNum = size(LT, 1);
 x0 = ones(nodeNum, 1);
-ut  = GenerateSrc(SRC, 0);
+ut = GenerateSrc(SRC, 0);
 % x = G\(B * ut);
 count = 1;
 fprintf('%d',count);

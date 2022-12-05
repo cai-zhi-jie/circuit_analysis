@@ -30,17 +30,33 @@ for i = 1:n-1
     end
 end
 
+
+for i = 1:n
+    if M(i,i) == 0
+        for j = 1:n
+            if M (j,i) ~= 0
+                M(i,:) = M(i,:) + M(j,:);
+                b(i,:) = b(i,:) + b(j,:);
+                break;
+            end
+        end
+    else
+        continue;
+    end
+end
+
 D = diag(diag(M));
 L = tril(M,-1);
 U = triu(M,1);
 G = inv(D+w*L);
-% G = pinv(D+w*L);
 N = (1-w)*D-w*U;
 
 for i=1:maxIter
+    xh = x;
     x = G*(N*x+w*b);
-    if norm(M*x-b) <= errorThres
+    if norm(x - xh, 2) <= errorThres
         break;
     end
 end
+fprintf('(%d/%d)\n',i,maxIter);
 result = x;

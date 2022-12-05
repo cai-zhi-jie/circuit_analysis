@@ -24,7 +24,7 @@ r0 = b - M * x;
 r = r0;
 iter = 0;
 
-if M' == M% symmetirc case
+if M' == M % symmetirc case
     disp('symmetric matrix');
     p = r;
     for j = 1 : m
@@ -39,7 +39,7 @@ if M' == M% symmetirc case
             break;
         end
         r = r - a * Mpj;
-        beta = ((M * r)' * Mpj) / (Mpj' * Mpj);
+        beta = ((M * r)' * Mpj); % / (Mpj' * Mpj);
         p = r - beta * p;
         iter = iter + 1;
     end
@@ -51,11 +51,18 @@ else % non-symmetric case
     p(:,1) = r;
     for j = 1:m
         % stop criteria
+        normMp = norm(Mp(:,j),2);
+        if (normMp ~= 0)
+            p(:,j) = p(:,j) / normMp;
+        end
         Mp(:,j) = M * p(:,j);
+        
         if (iter >= maxIter || norm(Mp(:,j),2) == 0)
             break;
         end
-        a = (r' * Mp(:,j)) / (Mp(:,j)' * Mp(:,j));
+%         a = (r' * Mp(:,j)) / (Mp(:,j)' * Mp(:,j));
+%         x = x + a * p(:,j);
+        a = (r' * Mp(:,j));
         x = x + a * p(:,j);
         if ( norm(a * p(:,j),2) < errorThres)
             break;
@@ -63,11 +70,13 @@ else % non-symmetric case
         r = r - a * Mp(:,j);
         p(:, j+1) = r;                                
         for i = 1:j
-            beta = ((M * r)' * Mp(:,i)) / (Mp(:,i)' * Mp(:,i));
-            p(:,j+1) = p(:,j+1) - beta * p(:,i);
+%             beta = ((M * r)' * Mp(:,i)) / (Mp(:,i)' * Mp(:,i));
+%             p(:,j+1) = p(:,j+1) - beta * p(:,i);
+            p(:,j+1) = p(:,j+1) - ((Mp(:,j))' * Mp(:,i)) * p(:,i);
         end
         iter = iter + 1;
     end
+    fprintf('(%d/%d)\n',j,m);
 end
 % return value 
 result = x;

@@ -13,18 +13,17 @@ if (m ~= n)
     return
 end
 
-if (norm(b,2) == 0)
-    result = zeros(size(x));
-    return
-end
+% if (norm(b,2) == 0)
+%     result = zeros(size(x));
+%     return
+% end
 
 maxIter = min(maxIter,m);
 
-r0 = b - M * x;
-r = r0;
+r = b - M * x;
 iter = 0;
 
-if M' == M% symmetirc case
+if M' == M % symmetirc case
     disp('symmetric matrix');
     p = r;
     for j = 1 : m
@@ -39,7 +38,7 @@ if M' == M% symmetirc case
             break;
         end
         r = r - a * Mpj;
-        beta = ((M * r)' * Mpj) / (Mpj' * Mpj);
+        beta = ((M * r)' * Mpj); % / (Mpj' * Mpj);
         p = r - beta * p;
         iter = iter + 1;
     end
@@ -48,25 +47,28 @@ else % non-symmetric case
 %     disp('non-symmetric matrix');    
     Mp = zeros(m, maxIter);
     p = zeros(m, maxIter);
-    p(:,1) = r;
     for j = 1:m
-        % stop criteria
-        Mp(:,j) = M * p(:,j);
-        if (iter >= maxIter || norm(Mp(:,j),2) == 0)
-            break;
+        p(:,j) = r;
+        Mp(:,j) = M * p(:,j);  
+        for i = 1:j-1
+            beta = Mp(:,j)' * Mp(:,i);
+            p(:,j) = p(:,j) - beta * p(:,i);
+            Mp(:,j) = Mp(:,j) - beta * Mp(:,i);
         end
-        a = (r' * Mp(:,j)) / (Mp(:,j)' * Mp(:,j));
+        normMp = norm(Mp(:,j),2);
+        if (normMp ~= 0)
+            p(:,j) = p(:,j) / normMp;
+            Mp(:,j) = Mp(:,j) / normMp;
+        end
+%         a = (r' * Mp(:,j)) / (Mp(:,j)' * Mp(:,j));
+%         x = x + a * p(:,j);
+        a = (r' * Mp(:,j));
         x = x + a * p(:,j);
-        if ( norm(a * p(:,j),2) < errorThres)
+        r = r - a * Mp(:,j);                  
+        iter = iter + 1;
+        if (iter >= maxIter || norm(a * p(:,j),2) < errorThres)
             break;
         end
-        r = r - a * Mp(:,j);
-        p(:, j+1) = r;                                
-        for i = 1:j
-            beta = ((M * r)' * Mp(:,i)) / (Mp(:,i)' * Mp(:,i));
-            p(:,j+1) = p(:,j+1) - beta * p(:,i);
-        end
-        iter = iter + 1;
     end
     fprintf('(%d/%d)\n',j,m);
 end

@@ -19,10 +19,12 @@ hspiceData = read_data(strcat(caseName,'.lis'));
 switch algorithmName
     case 'GCR'% 
         f = @(M, b, x)GCR(M, b, x, 1000, errorThres);
+    case 'GCR1'% 
+        f = @(M, b, x)gcr1(M, b, x, errorThres, 1000);
     case 'SOR'% 
         f = @(M, b, x)SOR(M, b, x, 1000, errorThres, 0.6);
     otherwise 
-        error('ALGORITHM CHOOSE ERROR');
+        f = @(M, b, x)Golden(M, b, x)
 end
 
 

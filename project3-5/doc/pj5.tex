@@ -19,6 +19,11 @@
 \usepackage{multirow}
 \usepackage{float}
 \usepackage{fancyhdr}  % header，footer的设置
+
+\newcommand{\subsubsubsection}[1]{\paragraph{#1}\mbox{}\\}
+\setcounter{secnumdepth}{4} % how many sectioning levels to assign numbers to
+\setcounter{tocdepth}{4} % how many sectioning levels to show in ToC
+
 % 封面的相关命令设置
 \newcommand{\hmwkTitle}{Project 5 Solve MNA}
 \newcommand{\hmwkClass}{《现代集成电路分析方法》}
@@ -258,19 +263,85 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
 \end{equation}
 
 \subsection{算法实现}
+
 \subsubsection{算法流程}
+\qquad 算法流程
+\begin{itemize}
+  \item 使用提供的stamp动态库对hsipce网表进行解析得到相应的矩阵数据，使用hspice进行仿真，得到相应的波形lis文件，调用read_data函数来得到相应lis文件中hspice仿真的波形结果。(main.m)
+  \item 根据stamp解析到的输入信号信息生成相应的激励信号数据。(GenerateSrc.m)
+  \item 根据函数的输入选择是使用Backward Euler还是Trapezoidal Rule的方法来求解偏微分方程。(BackwardEuler.m, TrapezoidalRule.m)
+  \item 在Backward Euler还是Trapezoidal Rule中根据函数的输入决定采用GCR还是SOR进行线性方程的求解。(GCR.m, SOR.m)
+  \item 将得到的仿真结果通过线性插值得到与hspice相同采样时间的数据点，并计算相应的误差（最大绝对误差和均方绝对误差）。(main.m)
+  \item 生成结果对比图。（report.m）
+\end{itemize}
+
+\qquad 文件结构
+\begin{itemize}
+  \item main.m:包含整个MNA方程的求解框架和流程。
+  \item BackwardEuler.m：实现后向欧拉求解法。
+  \item TrapezoidalRule.m：实现梯形法。
+  \item GCR.m：实现GCR算法。
+  \item SOR.m：实现SOR算法。
+  \item GenerateSrc.m:生成激励信号。
+  \item report.m:分析数据并绘制对比图。
+\end{itemize}
+
 \subsubsection{输入激励信号}
-\subsubsection{迭代终止条件}
-\subsubsection{输出结果}
+\qquad 脉冲源
+
+语法：
+
+Vxxx n+ n- PU<LSE> <(>v1 v2 <td <tr <tf <pw <per>>>>> <)>
+
+Ixxx n+ n- PU<LSE> <(>v1 v2 <td <tr <tf <pw <per>>>>> <)>
+
+其中v1为脉冲源的低压，v2为高压，td为延迟，tr为上升时间，tf为下降时间，pw为脉冲宽度，per为信号周期。下图展示了一个脉冲信号源的例子：
+
+\begin{figure}
+  \centering
+  \includegraphics[width=15cm]{figure/pulse.png}
+  \caption{脉冲信号源示例}
+\end{figure}
+
+\qquad 正弦源
+
+语法：
+
+Vxxx n+ n- SIN <(> vo va <freq <td <$\theta$ <$\phi$>>>> <)>
+
+Ixxx n+ n- SIN <(> vo va <freq <td <$\theta$ <$\phi$>>>> <)>
+
+其中vo为直流幅度，va为交流幅度，freq为频率，td为延时，$\theta$为衰减因子，$\phi$为相位延时。信号的公式可以如下：
+
+\begin{equation}
+  y(t) = e^{-\theta}\cdot va \cdot sin(2\pi freq \cdot(t-td) - \phi) + vo
+\end{equation}
+
+
+\subsubsection{线性方程组求解}
+不论是使用GCR还是SOR来求解线性方程组都需要确定一个误差容限，本实验中将误差容限$errorThres$的设置放到顶层函数接口，同时误差的标准为两次迭代间解$x$值的变化的2范数,即：
+
+\begin{equation}
+  ||x_{t+1} - x_{t}|| < errotThres
+\end{equation}
+
+此外迭代的轮数也要进行限制，GCR迭代的最大轮数即为矩阵的行/列数，SOR的最大迭代轮数设置成1000轮。
+
+
+\subsubsection{输出}
+\qquad 为了将仿真结果与hspice的结果进行对比，首先需要通过插值法得到自己仿真结果在hspice采样时间上的值，然后求解最大绝对误差和均方绝对误差。同时为了方便访问结果，使用save命令将仿真的数据存储到.mat文件中。对于有多个输出节点的电路，为了方便观察选取其中一个的波形进行绘制。
 
 \subsection{编译与运行}
 程序基于Matlab 2014a（32位）平台，将整个解析网表文件、MNA方程求解和结果输出的过程都打包在main函数中，main函数的接口为$main(caseName,methodName,algorithmName,startTime,endTime,stepNum,errorThres)$.其中caseName（RCL_s3,RCL_p3,bus8bit8seg,bus32seg16）,methodName（BE，TR）,algorithmName（SOR，GCR）分别对于测试用例名、常微分方程求解方法（后向欧拉和梯形法），以及线性方程求解方法。startTime和endTime为记录仿真结果的时间区间，stepNum为这一区间的采样数，errorThres为误差阈值。下面给出一个运行示例：
+
 \begin{equation}
   main('RLC_s3','BE','GCR',0 ,2*1e-2,1000,1e-9)
 \end{equation}
 
-
 \subsection{结果与分析}
+\subsubsection{实验结果}
+RLC_s3
+
 
 \qquad \par
 \qquad \par
