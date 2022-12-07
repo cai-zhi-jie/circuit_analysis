@@ -1,9 +1,9 @@
 function [result] = SOR(M, b, x, maxIter, errorThres, w )
 % Successive Over Relaxation
 % M,b,x-Mx = b
-% x0-the initial x
-% errorThres-the boundary of error
+% x-the initial x
 % maxIter-the maximum GCR iteration 
+% errorThres-the boundary of error
 % w-weight
 [m, n] = size(M);
 if (m ~= n)
@@ -11,6 +11,7 @@ if (m ~= n)
     result = x;
     return
 end
+%% preperation
 % swap line to make the diagnal element is non-zero
 for i = 1:n-1 
     if M(i,i) == 0
@@ -30,7 +31,7 @@ for i = 1:n-1
     end
 end
 
-
+% linear combination lines to make the pivot non-zero
 for i = 1:n
     if M(i,i) == 0
         for j = 1:n
@@ -50,7 +51,7 @@ L = tril(M,-1);
 U = triu(M,1);
 G = inv(D+w*L);
 N = (1-w)*D-w*U;
-
+%% iteration
 for i=1:maxIter
     xh = x;
     x = G*(N*x+w*b);

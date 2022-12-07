@@ -1,9 +1,9 @@
 function [result] = GCR(M, b, x, maxIter, errorThres)
 % Generalized Conjugate Residual
 % M,b,x-Mx = b
-% x0-the initial x
-% errorThres-the boundary of error
+% x-the initial x
 % maxIter-the maximum GCR iteration 
+% errorThres-the boundary of error
 
 [m,n] = size(M);
 
@@ -38,7 +38,7 @@ if M' == M % symmetirc case
             break;
         end
         r = r - a * Mpj;
-        beta = ((M * r)' * Mpj); % / (Mpj' * Mpj);
+        beta = ((M * r)' * Mpj) / (Mpj' * Mpj);
         p = r - beta * p;
         iter = iter + 1;
     end
@@ -60,8 +60,6 @@ else % non-symmetric case
             p(:,j) = p(:,j) / normMp;
             Mp(:,j) = Mp(:,j) / normMp;
         end
-%         a = (r' * Mp(:,j)) / (Mp(:,j)' * Mp(:,j));
-%         x = x + a * p(:,j);
         a = (r' * Mp(:,j));
         x = x + a * p(:,j);
         r = r - a * Mp(:,j);                  
@@ -72,7 +70,6 @@ else % non-symmetric case
     end
     fprintf('(%d/%d)\n',j,m);
 end
-% return value 
 result = x;
 
 

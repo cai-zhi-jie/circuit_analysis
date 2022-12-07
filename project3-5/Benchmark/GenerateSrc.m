@@ -23,7 +23,6 @@ for i = 1 : length(SRC)
         for j = 2:argc
             argv(j-1) = SRC{i}{j};
         end
-        % (t - tdelay) % tperiod
         if (t < argv(3))
             source(i) = argv(1);
         else

@@ -1,5 +1,5 @@
 function  report(filename)
-
+% report result by statistic and figure
 load(filename,'-mat');
 % output some useful info 
 fprintf('Number of Steps: %d\n',stepNum);

@@ -2,10 +2,10 @@ function [output, source, time] = TrapezoidalRule(C, G, B, LT, SRC, startTime, e
 % Trapezoidal Rule solver
 % C,G,B,LT,SRC-the matrixs from stamp command
 % [startTime, endTime]-simulated interval
-% errorThres-the error boundary for GCR solution
+% stepNum-TR step number
 % output-simulated output
 % source-input source
-% f-Mx=b solver
+% time-sample time vector
 
 
 %% initial state G * X(0) = B * U(0)
@@ -18,7 +18,6 @@ count = 1;
 fprintf('%d',count);
 count=count+1;
 x = f(G, B * ut, x0);
-% x = GCR(G, B * ut, x0, nodeNum, errorThres);
 t = 0;
 % (2C + tStep*G) * X(t) = (2C - tStep*G) * X(t-1) + tStep*B*(U(t) + U(t-1))
 tStep = (endTime - startTime) / stepNum;     

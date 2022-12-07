@@ -80,7 +80,9 @@
 \end{titlepage}
 
 
-
+\newpage
+\tableofcontents
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Problem Statement %%%
@@ -263,12 +265,12 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
   p_{k+1}=r^{k+1}-\sum_{j=0}^k \frac{\left(M r^{k+1}\right)^T\left(M p_j\right)}{\left(M p_j\right)^T\left(M p_j\right)} p_j \Rightarrow p_{k+1}=r^{k+1}-\frac{\left(M r^{k+1}\right)^T\left(M p_k\right)}{\left(M p_k\right)^T\left(M p_k\right)} p_k
 \end{equation}
 
-\subsection{算法实现}
+\section{算法实现}
 
-\subsubsection{算法流程}
+\subsection{算法流程}
 \qquad 算法流程
 \begin{itemize}
-  \item 使用提供的stamp动态库对hsipce网表进行解析得到相应的矩阵数据,使用hspice进行仿真,得到相应的波形lis文件,调用read_data函数来得到相应lis文件中hspice仿真的波形结果。(main.m)
+  \item 使用提供的stamp动态库对hsipce网表进行解析得到相应的矩阵数据,使用hspice进行仿真,得到相应的波形lis文件,调用read\_data函数来得到相应lis文件中hspice仿真的波形结果。(main.m)
   \item 根据stamp解析到的输入信号信息生成相应的激励信号数据。(GenerateSrc.m)
   \item 根据函数的输入选择是使用Backward Euler还是Trapezoidal Rule的方法来求解偏微分方程。(BackwardEuler.m, TrapezoidalRule.m)
   \item 在Backward Euler还是Trapezoidal Rule中根据函数的输入决定采用GCR还是SOR进行线性方程的求解。(GCR.m, SOR.m)
@@ -277,7 +279,7 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
 \end{itemize}
 
 
-\subsubsection{输入激励信号}
+\subsection{输入激励信号}
 \qquad 脉冲源
 
 \qquad 语法:
@@ -309,7 +311,7 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
 \end{equation}
 
 
-\subsubsection{线性方程组求解}
+\subsection{线性方程组求解}
 \qquad 不论是使用GCR还是SOR来求解线性方程组都需要确定一个误差容限,本实验中将误差容限$errorThres$的设置放到顶层函数接口,同时误差的标准为两次迭代间解$x$值的变化的2范数,即:
 
 \begin{equation}
@@ -318,20 +320,20 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
 
 \qquad 此外迭代的轮数也要进行限制,GCR迭代的最大轮数即为矩阵的行/列数,SOR的最大迭代轮数设置成1000轮。
 
-\subsubsection{输出}
+\subsection{输出}
 \qquad 为了将仿真结果与hspice的结果进行对比,首先需要通过插值法得到自己仿真结果在hspice采样时间上的值,然后求解最大绝对误差和均方绝对误差。同时为了方便访问结果,使用save命令将仿真的数据存储到.mat文件中。对于有多个输出节点的电路,为了方便观察选取其中一个的波形进行绘制。
 
-\subsection{编译与运行}
-\qquad 程序基于Matlab 2014a(32位)平台,将整个解析网表文件、MNA方程求解和结果输出的过程都打包在main函数中,main函数的接口为$main(caseName, methodName,algorithmName, startTime, endTime, stepNum, errorThres)$. 其中caseName(RCL\_s3, RCL\_p3,bus8bit8seg,bus32seg16),methodName(BE,TR),algorithmName(SOR,GCR)分别对于测试用例名、常微分方程求解方法(后向欧拉和梯形法),以及线性方程求解方法。startTime和endTime为记录仿真结果的时间区间,stepNum为这一区间的采样数,errorThres为误差阈值。下面给出一个运行示例:
+\section{编译与运行}
+\qquad 程序基于Matlab 2015b(32位)平台,将整个解析网表文件、MNA方程求解和结果输出的过程都打包在main函数中，由于所有benchmark都在Benchmark目录中，所以需要在matlab中将当前目录切换到Benchmark下运行。main函数的接口为$main(caseName, methodName,algorithmName, startTime, endTime, stepNum, errorThres)$. 其中caseName(RCL\_s3, RCL\_p3,bus8bit8seg,bus32seg16),methodName(BE,TR), \\ algorithmName(SOR,GCR)分别对于测试用例名、常微分方程求解方法(后向欧拉和梯形法),以及线性方程求解方法。startTime和endTime为记录仿真结果的时间区间,stepNum为这一区间的采样数,errorThres为误差阈值。下面给出一个运行示例:
 
 \begin{equation}
-  main('RLC_s3','BE','GCR',0 ,2*1e-2,1000,1e-9)
+  main('RLC_s3','BE','GCR',0 ,2e-2,1000,1e-9)
 \end{equation}
 
-\subsection{结果与分析}
-\subsubsection{实验结果}
-\subsubsubsection{RLC\_s3(正弦激励信号)}
-\qquad 仿真设置:起始时间0s,终止时间0.02s,采样点数1000,误差容限$1e^{-9}$,下面展示了几种算法得到的仿真结果:
+\section{结果与分析}
+\subsection{实验结果}
+\subsubsection{RLC\_s3(正弦激励信号)}
+\qquad 仿真设置:起始时间0s,终止时间0.02s,采样点数1000,误差容限$1e^{-9}$,输入的正弦信号激励为$3sin(400\pi t)$。下面展示了几种算法得到的仿真结果:
 
 后向欧拉(BE)+GCR:
 
@@ -365,8 +367,8 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
   \caption{RLC\_s3\_TR\_SOR实验结果}
 \end{figure}
 
-\subsubsubsection{RLC\_p3(脉冲激励信号)}
-\qquad 仿真设置:起始时间0s,终止时间0.02s,采样点数1000,误差容限$1e^{-9}$,下面展示了几种算法得到的仿真结果:
+\subsubsection{RLC\_p3(脉冲激励信号)}
+\qquad 仿真设置:起始时间0s,终止时间0.02s,采样点数1000,误差容限$1e^{-9}$,输入的方波信号为周期为20ms，高低电平分别为3V和0V，上升下降时间为1ms，高电平时间为3ms，信号延迟为1ms。下面展示了几种算法得到的仿真结果:
 
 后向欧拉(BE)+GCR:
 
@@ -400,8 +402,8 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
   \caption{RLC\_p3\_TR\_SOR实验结果}
 \end{figure}
 
-\subsubsubsection{bus8bit8seg(脉冲激励信号)}
-\qquad 仿真设置:起始时间0s,终止时间$1e^{-9}$s,采样点数1000,误差容限$1e^{-9}$,下面展示了几种算法得到的仿真结果:
+\subsubsection{bus8bit8seg(脉冲激励信号)}
+\qquad 仿真设置:起始时间0s,终止时间$1e^{-9}$s,采样点数1000,误差容限$1e^{-9}$,输入的方波信号为周期为0.5ns，高低电平分别为1V和0V，上升下降时间为0.05ns，高电平时间为0.3ns，信号延迟为0.05ns。下面展示了几种算法得到的仿真结果:
 
 后向欧拉(BE)+GCR:
 
@@ -419,8 +421,8 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
   \caption{bus8bit8seg\_TR\_GCR实验结果}
 \end{figure}
 
-\subsubsubsection{bus32seg16(脉冲激励信号)}
-\qquad 仿真设置:起始时间0s,终止时间$1e^{-9}$s,采样点数1000,误差容限$1e^{-9}$,下面展示了几种算法得到的仿真结果:
+\subsubsection{bus32seg16(脉冲激励信号)}
+\qquad 仿真设置:起始时间0s,终止时间$1e^{-9}$s,采样点数1000,误差容限$1e^{-9}$,输入的方波信号为周期为0.5ns，高低电平分别为1V和0V，上升下降时间为0.05ns，高电平时间为0.3ns，信号延迟为0.05ns。下面展示了几种算法得到的仿真结果:
 
 后向欧拉(BE)+GCR:
 
@@ -438,11 +440,11 @@ x\left(t_{l+1}\right) \cong x\left(t_l\right)+\Delta t A x\left(t_{l+1}\right)
   \caption{bus32seg16\_TR\_GCR实验结果}
 \end{figure}
 
-\subsubsection{结果分析}
+\subsection{结果分析}
 
-\qquad 从上述结果中可以看出在给定的电路已经仿真条件下使用后向欧拉法和梯形法得到的误差相差不大,运行时间上也没有显著的差异,分析原因可能是电路本身都是稳定的,同时由于实现过程中Matlab底层对矩阵不同运算处理的优化上不同。此外SOR和GCR两种求解线性方程组的方法在RLC的例子上表现相当,但是SOR的收敛轮数会大于GCR的收敛轮数,此外还尝试使用了matlab自带的线性方程求解方法(\\,于golden.m文件中),得到的结果与GCR,SOR相近,同时运行时间明显更快,可见matlab自带的线性方程求解器的高效。
+\qquad 从上述结果中可以看出在给定的电路已经仿真条件下使用后向欧拉法和梯形法得到的误差相差不大,运行时间上也没有显著的差异,分析原因可能是电路本身都是稳定的,同时由于实现过程中Matlab底层对矩阵不同运算处理的优化上不同。此外SOR和GCR两种求解线性方程组的方法在RLC的例子上表现相当,但是SOR的收敛轮数会大于GCR的收敛轮数,此外还尝试使用了matlab自带的线性方程求解方法(于golden.m文件中),得到的结果与GCR,SOR相近,同时运行时间明显更快,可见matlab自带的线性方程求解器的高效。
 
-\subsection{文件说明}
+\section{文件说明}
 \qquad src目录中的文件结构
 \begin{itemize}
   \item main.m:包含整个MNA方程的求解框架和流程。

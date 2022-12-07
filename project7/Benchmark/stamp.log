@@ -1,0 +1,28 @@
+Input filename: RLC_s3.sp
+
+Node number: 7
+
+Auxilliary number: 4
+
+Component number: 11
+
+Input number: 1
+
+Output number: 1
+
+Node names: 
+0(0)	N_1X1(3)	N_1X2(5)	N_1X3(7)	N_IN1(1)	
+N_IN2(4)	N_IN3(6)	N_OUT(2)	
+
+Auxilliary current names: 
+LSEGX1(2)	LSEGX2(3)	LSEGX3(4)	VIN(1)	
+
+Input current sources: 
+
+
+Input voltage sources: 
+VIN	
+
+Output nodes: 
+N_OUT	
+

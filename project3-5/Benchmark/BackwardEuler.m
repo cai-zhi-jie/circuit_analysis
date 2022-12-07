@@ -2,17 +2,16 @@ function [output, source, time] = BackwardEuler(C, G, B, LT, SRC, startTime, end
 % Backward Euler solver
 % C,G,B,LT,SRC-the matrixs from stamp command
 % [startTime, endTime]-simulated interval
-% errorThres-the error boundary for GCR solution
+% stepNum-BE step number
 % output-simulated output
 % source-input source
-% f-Mx=b solver
+% time-sample time vector
 
 %% initial state G * X(0) = B * U(0)
 nodeNum = size(G, 1);
 outputNum = size(LT, 1);
 x0 = ones(nodeNum, 1);
 ut = GenerateSrc(SRC, 0);
-% x = G\(B * ut);
 count = 1;
 fprintf('%d',count);
 count=count+1;
@@ -26,7 +25,6 @@ for i = 1:floor(startTime/tStep)
     t = t + tStep;
     ut = GenerateSrc(SRC, t);
     b = C*x + tStep*B*ut;
-%     x = M\b;
     fprintf('%d',count);
     count=count+1;
     x = f(M, b, x0);
@@ -36,7 +34,6 @@ if (t ~= startTime)
     t = startTime;
     ut = GenerateSrc(SRC, t);
     b = C*x + deltaT*B*ut;
-%     x = M\b;
     fprintf('%d',count);
     count=count+1;
     x = f(M, b, x0);
@@ -51,7 +48,6 @@ for i = 1 : stepNum
     t = t + tStep;
     ut = GenerateSrc(SRC, t);
     b = C * x + tStep * B * ut;
-%     x = M\b;
     fprintf('%d',count);
     count=count+1;
     x = f(M, b, x0);

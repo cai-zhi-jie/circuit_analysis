@@ -1,0 +1,28 @@
+\contentsline {section}{\numberline {1}题目}{2}{}%
+\contentsline {subsection}{\numberline {1.1}输入}{2}{}%
+\contentsline {subsection}{\numberline {1.2}输出结果}{2}{}%
+\contentsline {subsection}{\numberline {1.3}测试用例}{2}{}%
+\contentsline {subsection}{\numberline {1.4}提交结果}{2}{}%
+\contentsline {section}{\numberline {2}算法原理}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Shooting Method}{3}{}%
+\contentsline {subsection}{\numberline {2.2}牛顿迭代法}{4}{}%
+\contentsline {subsection}{\numberline {2.3}后向欧拉法Backward Euler}{5}{}%
+\contentsline {subsection}{\numberline {2.4}广义共轭残差法GCR}{6}{}%
+\contentsline {section}{\numberline {3}算法实现}{7}{}%
+\contentsline {subsection}{\numberline {3.1}算法流程}{7}{}%
+\contentsline {subsection}{\numberline {3.2}输入激励信号}{7}{}%
+\contentsline {subsection}{\numberline {3.3}输出}{8}{}%
+\contentsline {subsection}{\numberline {3.4}编译与运行}{8}{}%
+\contentsline {section}{\numberline {4}结果与分析}{9}{}%
+\contentsline {subsection}{\numberline {4.1}实验结果}{9}{}%
+\contentsline {subsubsection}{\numberline {4.1.1}RLC电路}{9}{}%
+\contentsline {paragraph}{\numberline {4.1.1.1}正弦激励}{9}{}%
+\contentsline {paragraph}{\numberline {4.1.1.2}方波信号激励}{10}{}%
+\contentsline {subsubsection}{\numberline {4.1.2}bus8bit8seg电路}{11}{}%
+\contentsline {paragraph}{\numberline {4.1.2.1}正弦激励}{11}{}%
+\contentsline {paragraph}{\numberline {4.1.2.2}方波信号激励}{12}{}%
+\contentsline {subsubsection}{\numberline {4.1.3}bus32seg16电路}{13}{}%
+\contentsline {paragraph}{\numberline {4.1.3.1}正弦激励}{13}{}%
+\contentsline {paragraph}{\numberline {4.1.3.2}方波信号激励}{14}{}%
+\contentsline {subsection}{\numberline {4.2}结果分析}{14}{}%
+\contentsline {section}{\numberline {5}文件结构}{15}{}%

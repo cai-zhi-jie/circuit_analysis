@@ -2,6 +2,7 @@ function [] = main(caseName, methodName, algorithmName, startTime, endTime, step
 % PJ-V : Solving MNA Equation.
 % caseName
 % methodName
+% algorithmName
 % startTime
 % endTime
 % stepNum
@@ -19,12 +20,10 @@ hspiceData = read_data(strcat(caseName,'.lis'));
 switch algorithmName
     case 'GCR'% 
         f = @(M, b, x)GCR(M, b, x, 1000, errorThres);
-    case 'GCR1'% 
-        f = @(M, b, x)gcr1(M, b, x, errorThres, 1000);
     case 'SOR'% 
         f = @(M, b, x)SOR(M, b, x, 1000, errorThres, 0.6);
     otherwise 
-        f = @(M, b, x)Golden(M, b, x)
+        f = @(M, b, x)Golden(M, b, x);
 end
 
 
@@ -35,7 +34,7 @@ switch methodName
     case 'TR'% Trapezoidal Rule
         [output, source, time] = TrapezoidalRule(C, G, B, LT, SRC, startTime, endTime, stepNum, f);
     otherwise 
-        error('ALGORITHM CHOOSE ERROR');
+        [output, source, time] = BackwardEuler(C, G, B, LT, SRC, startTime, endTime, stepNum, f);
 end
 runtime = toc;
 

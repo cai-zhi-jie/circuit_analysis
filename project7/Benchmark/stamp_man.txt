@@ -1,0 +1,15 @@
+stamp.dll是matlab mex函数。
+使用方法：
+1.将stamp.dll放在spice网表文件所在目录，启动matlab，将matlab当前目录切换到spice网表及stamp.dll所在目录。
+2.在Matlab下执行stamp sp_file，电路矩阵B,C,G,LT即写入Matlab工作空间。NUM_AUX及NUM_NODE分别表示辅助电流
+数目和节点数目，SRC存储输入激励信息。其中LT矩阵根据spice网表中的.probe命令得到。
+例如，对RLC_s3.sp，在Matlab下执行命令如下：
+>> stamp RLC_s3.sp
+Parsing ends succussfully.
+	#Nodes: 7
+	#Auxilliary branches: 4
+	#Components: 11
+	#Inputs: 1
+	#Outputs: 0
+>>
+
